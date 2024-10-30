@@ -2,7 +2,7 @@
 #include <bits/stdc++.h> 
 #pragma GCC optimize("O3", "unroll-loops")
 using namespace std;
-
+#define int long long
 vector<set<int>>s;
 int Q;
 
@@ -12,7 +12,9 @@ void solve(){
         int a, q, b; cin >> a >> q >> b;
         set<int>curr;
         Q = q;
-        for (int i = a; i<=b; i+=q) curr.insert(i);
+        for (int i = a; i<=b; i+=q) {
+            curr.insert(i);
+        }
         s.emplace_back(curr);
         return;
     }

@@ -1,3 +1,5 @@
+// Sylwia Sapkowska
+
 #ifndef _ZBIOR_ARY_H_
 #define _ZBIOR_ARY_H_
 
