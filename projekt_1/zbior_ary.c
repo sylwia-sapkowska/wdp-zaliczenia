@@ -69,14 +69,14 @@ int max(int a, int b){
     return a > b ? a : b;
 }
 
-// Sprawdza, czy dwa ciagi tego samego typu sa rozlaczne
+// Sprawdza, czy dwa ciagi tej samej klasy sa rozlaczne
 bool rozlaczne(int pocz1, int kon1, int pocz2, int kon2){
     return (kon1 < pocz2 || kon2 < pocz1);
 }
 
 // Funkcja dodaje ciąg [pocz, kon] do klasy suma[poz_klasy], sprawdzając czy istnieje możliwość połączenia go z poprzednio rozważonymi ciągami
 void dodaj_ciag(klasa_ciagow klasa, int *ostatni, int pocz, int kon){
-    if (klasa.pocz[*ostatni] != INT_MAX &&  
+    if (klasa.kon[*ostatni] != INT_MIN &&  
             rozlaczne(klasa.pocz[*ostatni], klasa.kon[*ostatni], pocz, kon)){
         // Jeśli ciągi arytmetyczne są rozłączne, ale ich suma teoriomnościowa jest jednym ciągiem, to łączymy je w jeden ciąg.
         if ((long long)klasa.kon[*ostatni] + (long long)Q == (long long)pocz){
@@ -94,14 +94,15 @@ void dodaj_ciag(klasa_ciagow klasa, int *ostatni, int pocz, int kon){
 }
 
 // Funkcja napraw_rozmiar zmienia rozmiar tablicy początków i końców ciągów w zależności od znalezionej ilości rozłącznych ciągów w klasie.
-// Algorytmy znajdujące teoriomnogościową sumę, iloczyn i różnicę na początku tworzą klasę ciągów arytmetycznych o maksymalnej możliwej liczbie ciągów.
+// Algorytmy znajdujące teoriomnogościową sumę, iloczyn i różnicę na początku ich wywołania tworzą klasę ciągów arytmetycznych 
+// o maksymalnej możliwej liczbie ciągów, wiec na koniec rozmiar klasy ciagow jest odpowiednio zmniejszany.
 void napraw_rozmiar_klasy(klasa_ciagow klasa){
     klasa.pocz = realloc(klasa.pocz, klasa.liczba_ciagow * sizeof(int));
     klasa.kon = realloc(klasa.kon, klasa.liczba_ciagow * sizeof(int));
 }
 
 // Łączy dwa zbiory ciągów arytmetycznych tej samej klasy w jedną klasę będącą teoriomnogościową sumą tych zbiorów, 
-// zapisując wynik do klasy suma[poz_klasy].
+// Funkcja zapisuje wynik do klasa_sumy.
 void polacz(klasa_ciagow *klasa_sumy, klasa_ciagow klasa1, klasa_ciagow klasa2){
     int i = 0, j = 0;
     int rozmiar = 0;
@@ -116,7 +117,7 @@ void polacz(klasa_ciagow *klasa_sumy, klasa_ciagow klasa1, klasa_ciagow klasa2){
             j++;
         }
     }
-    if (klasa_sumy->pocz[0] != INT_MAX){
+    if (klasa_sumy->kon[0] != INT_MIN){
         rozmiar++;
     }
     klasa_sumy->liczba_ciagow = (unsigned)rozmiar;
@@ -222,9 +223,12 @@ zbior_ary iloczyn(zbior_ary A, zbior_ary B){
 void znajdz_roznice(klasa_ciagow *klasa_roznicy, klasa_ciagow a, klasa_ciagow b){
     *klasa_roznicy = stworz_klase_ciagow(a.liczba_ciagow);
     int j = 0;
-
     int rozmiar = 0;
     for (int i = 0; i<(int)a.liczba_ciagow; i++){
+        // Dla i-tego ciągu należącego do klasy a sprawdzamy wszystkie ciągi z klasy b się z nim przecinające.
+        // Utrzymywany jest przedział [l, r] będący podprzedziałem ciągu a[i], który nie został jeszcze rozpatrzony.
+        // Gdy napotykamy ciag b[j] przecinający sie z a[i], to dodajemy ciag znajdujacy sie z lewej b[j] nalezacy do a[i]
+        // oraz zmieniamy l, by ciąg [l, r] zaczynał się za przedziałem b[j].
         long long l = a.pocz[i];
         long long r = a.kon[i];
         while (j < (int)b.liczba_ciagow && b.pocz[j] <= r) {

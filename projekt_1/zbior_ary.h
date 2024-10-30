@@ -12,7 +12,8 @@ typedef struct klasa_ciagow {
 	unsigned liczba_ciagow;
 } klasa_ciagow;
 
-// Struktura zbior_ary zawiera zbiór ciągów arytmetycznych pogrupowanych w klasy o tej samej reszcie elementów mod Q.
+// Struktura zbior_ary zawiera zbiór ciągów arytmetycznych pogrupowanych w klasy o tej samej reszcie elementów mod Q, 
+// Klasy ciagow są posortowane względem reszty elementow mod Q
 typedef struct zbior_ary {
 	klasa_ciagow *ciagi;
 	unsigned liczba_klas;
