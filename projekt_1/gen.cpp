@@ -10,10 +10,10 @@ int losuj(int a, int b){
 }
 
 pair<int, int>para(int M, int Q){
-    int a = losuj(1, M);
-    return {a, a + losuj(0, M) * Q};
+    int b = losuj(INT_MAX-M, INT_MAX);
+    return {b - losuj(0, M) * Q, b};
 }
-const int M = 100;
+const int M = 10;
 
 void solve(){
     int op = losuj(1, M);
@@ -34,7 +34,7 @@ void solve(){
             cnt++;
             break;
         case 2: //singleton
-            cout << "S " << losuj(1, M) << "\n";
+            cout << "S " << losuj(INT_MAX-M, INT_MAX) << "\n";
             cnt++;
             break;
 
