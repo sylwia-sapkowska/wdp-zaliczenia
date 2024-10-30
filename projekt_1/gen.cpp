@@ -10,10 +10,10 @@ int losuj(int a, int b){
 }
 
 pair<int, int>para(int M, int Q){
-    int b = losuj(INT_MAX-M, INT_MAX);
+    int b = losuj(-M, M);
     return {b - losuj(0, M) * Q, b};
 }
-const int M = 10;
+const int M = 1000;
 
 void solve(){
     int op = losuj(1, M);
