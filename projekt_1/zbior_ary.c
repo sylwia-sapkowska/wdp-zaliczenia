@@ -4,7 +4,6 @@
 #include <assert.h>
 #include <limits.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 static int Q = -1;
 
@@ -32,7 +31,7 @@ klasa_ciagow stworz_klase_ciagow(unsigned liczba_ciagow){
     assert(nowa_klasa.kon != NULL);
 
     // Inicjalizacja początków i końców ciągów jako INT_MAX i INT_MIN
-    for (int i = 0; i<(int)liczba_ciagow; i++){
+    for (int i = 0; i < (int)liczba_ciagow; i++){
         nowa_klasa.pocz[i] = INT_MAX;
         nowa_klasa.kon[i] = INT_MIN;
     }
@@ -61,6 +60,14 @@ zbior_ary singleton(int a){
     return ciag_arytmetyczny(a, Q, a);
 }
 
+int mod(int a){
+    int b =  a % Q;
+    if (b < 0) {
+        b += Q;
+    }
+    return b;
+}
+
 int min(int a, int b){
     return a < b ? a : b;
 }
@@ -76,7 +83,7 @@ bool rozlaczne(int pocz1, int kon1, int pocz2, int kon2){
 
 // Funkcja dodaje ciąg [pocz, kon] do klasy suma[poz_klasy], sprawdzając czy istnieje możliwość połączenia go z poprzednio rozważonymi ciągami
 void dodaj_ciag(klasa_ciagow klasa, int *ostatni, int pocz, int kon){
-    if (klasa.kon[*ostatni] != INT_MIN &&  
+    if (klasa.pocz[*ostatni] <= klasa.kon[*ostatni] &&  
             rozlaczne(klasa.pocz[*ostatni], klasa.kon[*ostatni], pocz, kon)){
         // Jeśli ciągi arytmetyczne są rozłączne, ale ich suma teoriomnościowa jest jednym ciągiem, to łączymy je w jeden ciąg.
         if ((long long)klasa.kon[*ostatni] + (long long)Q == (long long)pocz){
@@ -117,7 +124,7 @@ void polacz(klasa_ciagow *klasa_sumy, klasa_ciagow klasa1, klasa_ciagow klasa2){
             j++;
         }
     }
-    if (klasa_sumy->kon[0] != INT_MIN){
+    if (klasa_sumy->pocz[0] <= klasa_sumy->kon[0]){
         rozmiar++;
     }
     klasa_sumy->liczba_ciagow = (unsigned)rozmiar;
@@ -127,7 +134,7 @@ void polacz(klasa_ciagow *klasa_sumy, klasa_ciagow klasa1, klasa_ciagow klasa2){
 // Zwraca resztę klasy, czyli np. resztę z dzielenia początku pierwszego ciągu w klasie przez Q lub INT_MAX jeśli klasa nie istnieje.
 int daj_reszte_klasy(zbior_ary *A, int klasa){
     if (klasa >= (int)A->liczba_klas) return INT_MAX;
-    return A->ciagi[klasa].pocz[0] % Q;
+    return mod(A->ciagi[klasa].pocz[0]);
 }
 
 // Daje w wyniku zbior reprezentujacy teoriomnogosciowa sume zbiorow ciągów A i B.
@@ -224,7 +231,7 @@ void znajdz_roznice(klasa_ciagow *klasa_roznicy, klasa_ciagow a, klasa_ciagow b)
     *klasa_roznicy = stworz_klase_ciagow(a.liczba_ciagow);
     int j = 0;
     int rozmiar = 0;
-    for (int i = 0; i<(int)a.liczba_ciagow; i++){
+    for (int i = 0; i < (int)a.liczba_ciagow; i++){
         // Dla i-tego ciągu należącego do klasy a sprawdzamy wszystkie ciągi z klasy b się z nim przecinające.
         // Utrzymywany jest przedział [l, r] będący podprzedziałem ciągu a[i], który nie został jeszcze rozpatrzony.
         // Gdy napotykamy ciag b[j] przecinający sie z a[i], to dodajemy ciag znajdujacy sie z lewej b[j] nalezacy do a[i]
@@ -260,7 +267,7 @@ zbior_ary roznica(zbior_ary A, zbior_ary B){
     int j = 0;
     zbior_ary roznica = stworz_zbior_ciagow(A.liczba_klas);
     int ost = 0;
-    for (int i = 0; i<(int)A.liczba_klas; i++){
+    for (int i = 0; i < (int)A.liczba_klas; i++){
         while (j < (int)B.liczba_klas && daj_reszte_klasy(&B, j) < daj_reszte_klasy(&A, i)){
             j++;
         }
@@ -289,7 +296,7 @@ bool nalezy_do_ciagu(int a, int b, int wartosc){
 
 // Daje w wyniku true wtw. gdy liczba b nalezy do zbioru A.
 bool nalezy(zbior_ary A, int b){
-    int reszta = b % Q;
+    int reszta = mod(b);
 
     // Ponieważ klasy są posortowane względem reszty elementów mod Q, to możemy zastosować wyszukiwanie binarne po wyniku
     // by znaleźć klasę mającą resztę reszta.
@@ -329,8 +336,8 @@ bool nalezy(zbior_ary A, int b){
 unsigned moc(zbior_ary A){
     unsigned liczba_elementow = 0;
     // Liczymy liczbę elementów w każdym ciągu arytmetycznym w klasie.
-    for (int i = 0; i<(int)A.liczba_klas; i++){
-        for (int j = 0; j<(int)A.ciagi[i].liczba_ciagow; j++){
+    for (int i = 0; i < (int)A.liczba_klas; i++){
+        for (int j = 0; j < (int)A.ciagi[i].liczba_ciagow; j++){
             int dlugosc_ciagu_arytm = (A.ciagi[i].kon[j] - A.ciagi[i].pocz[j]) / Q + 1;
             assert(dlugosc_ciagu_arytm > 0);
             liczba_elementow += (unsigned)dlugosc_ciagu_arytm;
@@ -343,7 +350,7 @@ unsigned moc(zbior_ary A){
 unsigned ary(zbior_ary A){
     unsigned ary_q = 0;
     // W każdej klasie i jest A.ciag[i].liczba_ciagow rozłącznych ciągów arytmetycznych.
-    for (int i = 0; i<(int)A.liczba_klas; i++){
+    for (int i = 0; i < (int)A.liczba_klas; i++){
         ary_q += A.ciagi[i].liczba_ciagow;
     }
     return ary_q;
