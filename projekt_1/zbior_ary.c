@@ -338,7 +338,7 @@ unsigned moc(zbior_ary A){
     // Liczymy liczbę elementów w każdym ciągu arytmetycznym w klasie.
     for (int i = 0; i < (int)A.liczba_klas; i++){
         for (int j = 0; j < (int)A.ciagi[i].liczba_ciagow; j++){
-            int dlugosc_ciagu_arytm = (A.ciagi[i].kon[j] - A.ciagi[i].pocz[j]) / Q + 1;
+            long long dlugosc_ciagu_arytm = ((long long)A.ciagi[i].kon[j] - (long long)A.ciagi[i].pocz[j]) / (long long)Q + 1;
             assert(dlugosc_ciagu_arytm > 0);
             liczba_elementow += (unsigned)dlugosc_ciagu_arytm;
         }
