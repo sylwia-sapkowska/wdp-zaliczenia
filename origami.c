@@ -95,6 +95,10 @@ void unfold(P** points, int *size, Line L){
     free(*points);
     *size = ptr;
     *points = unfolded_points;
+    if ((*size) == 0){
+        return;
+    }
+    *points = realloc(*points, (unsigned)(*size) * sizeof(P));
 }
 
 // Returns whether point X is inside the paper
@@ -111,7 +115,7 @@ bool inside(P X, Paper paper){
     }
 }
 
-// Returns the number of folds that pass through point X
+// Returns the number of layers of paper that pass through point X
 int number_of_folds(Paper paper, P X){
     P* reflections = (P*)malloc(sizeof(P));
     int size = 1;
