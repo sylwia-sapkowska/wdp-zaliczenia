@@ -15,7 +15,7 @@ struct interesant {
     int id; // numer interesanta
     interesant* lewy, *prawy; // wskaźniki na poprzedniego i następnego interesanta w kolejce
 
-    interesant() {}
+    interesant() { id = -1; lewy = prawy = nullptr; }
     interesant(int _id) : id(_id), lewy(nullptr), prawy(nullptr) {}
 };
 

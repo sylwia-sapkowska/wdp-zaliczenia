@@ -4,80 +4,84 @@
 #include "kol.h"
 using namespace std;
 
-// Struktura kolejki przy pomocy listy dwukierunkowej
-struct kolejka{
-    interesant *przod, *tyl;
-};
+namespace {
+    // Struktura kolejki przy pomocy listy dwukierunkowej
+    struct kolejka{
+        interesant *przod, *tyl;
+    };
 
-// Tworzy nową kolejkę z dwoma wartownikami
-void stworz_kolejke(kolejka*q){
-    q->przod = (interesant*)malloc(sizeof(interesant));
-    q->tyl = (interesant*)malloc(sizeof(interesant));
-    q->przod->prawy = q->tyl;
-    q->tyl->prawy = q->przod;
-    q->przod->lewy = q->przod;
-    q->tyl->lewy = q->tyl;
-}
-
-// Sprawdza czy kolejka jest pusta
-bool pusta(kolejka*q){
-    return q->przod->prawy == q->tyl;
-}
-
-void polacz(interesant* el, interesant *poprz, interesant *nowy){
-    if (el){
-        if (el->lewy == poprz) el->lewy = nowy;
-        else el->prawy = nowy;
+    // Tworzy nową kolejkę z dwoma wartownikami
+    void stworz_kolejke(kolejka*q){
+        q->przod = (interesant*)malloc(sizeof(interesant));
+        q->tyl = (interesant*)malloc(sizeof(interesant));
+        q->przod->prawy = q->tyl;
+        q->tyl->prawy = q->przod;
+        q->przod->lewy = q->przod;
+        q->tyl->lewy = q->tyl;
+        q->przod->id = -1;
+        q->tyl->id = -1;
     }
-}
 
-// Wstawia nowy element pomiędzy p i q
-void wsadz_pomiedzy(interesant*p, interesant*q, interesant*r){
-    r->lewy = p;
-    r->prawy = q;
-    polacz(p, q, r);
-    polacz(q, p, r);
-}
+    // Sprawdza czy kolejka jest pusta
+    bool pusta(kolejka*q){
+        return q->przod->prawy == q->tyl;
+    }
 
-// Dodaje element na koniec kolejki
-void dodaj_na_tyl(kolejka *q, interesant *el){
-    wsadz_pomiedzy(q->tyl, q->tyl->prawy, el);
-}
+    void polacz(interesant* el, interesant *poprz, interesant *nowy){
+        if (el){
+            if (el->lewy == poprz) el->lewy = nowy;
+            else el->prawy = nowy;
+        }
+    }
 
-// Usuwa element z kolejki
-void usun_interesanta(interesant *e){
-    assert(e->id != -1);
-    auto e1 = e->lewy;
-    auto e2 = e->prawy;
-    polacz(e1, e, e2);
-    polacz(e2, e, e1);
-}
+    // Wstawia nowy element pomiędzy p i q
+    void wsadz_pomiedzy(interesant *p, interesant *q, interesant *r){
+        r->lewy = p;
+        r->prawy = q;
+        polacz(p, q, r);
+        polacz(q, p, r);
+    }
 
-// Usuwa element z przodu kolejki i zwraca wskaźnik na niego
-interesant* usun_z_przodu(kolejka *q){
-    if (pusta(q)) return nullptr;
-    interesant* i = q->przod->prawy;
-    usun_interesanta(q->przod->prawy);
-    return i;
-}
+    // Dodaje element na koniec kolejki
+    void dodaj_na_tyl(kolejka *q, interesant *el){
+        wsadz_pomiedzy(q->tyl, q->tyl->prawy, el);
+    }
 
-// Łączy dwie kolejki
-void polacz_kolejki(kolejka *l1, kolejka *l2){
-    interesant* f1 = l1->przod;
-    interesant* b1 = l1->tyl;
-    interesant* f2 = l2->przod;
-    interesant* b2 = l2->tyl;
+    // Usuwa element z kolejki
+    void usun_interesanta(interesant *e){
+        assert(e->id != -1);
+        auto e1 = e->lewy;
+        auto e2 = e->prawy;
+        polacz(e1, e, e2);
+        polacz(e2, e, e1);
+    }
 
-    interesant* e1 = b1->prawy;
-    interesant* e2 = f2->prawy;
-    assert(f1 != b1 && f2 != b2);
-   
-    polacz(e1, b1, e2);
-    polacz(e2, f2, e1);
-    l1->tyl = b2;
-    f2->prawy = b1;
-    b1->prawy = f2;
-    l2->tyl = b1;
+    // Usuwa element z przodu kolejki i zwraca wskaźnik na niego
+    interesant* usun_z_przodu(kolejka *q){
+        if (pusta(q)) return nullptr;
+        interesant* i = q->przod->prawy;
+        usun_interesanta(q->przod->prawy);
+        return i;
+    }
+
+    // Łączy dwie kolejki
+    void polacz_kolejki(kolejka *l1, kolejka *l2){
+        interesant* f1 = l1->przod;
+        interesant* b1 = l1->tyl;
+        interesant* f2 = l2->przod;
+        interesant* b2 = l2->tyl;
+
+        interesant* e1 = b1->prawy;
+        interesant* e2 = f2->prawy;
+        assert(f1 != b1 && f2 != b2);
+    
+        polacz(e1, b1, e2);
+        polacz(e2, f2, e1);
+        l1->tyl = b2;
+        f2->prawy = b1;
+        b1->prawy = f2;
+        l2->tyl = b1;
+    }
 }
 
 // Operacje urzedowe - zgodnie z opisem w kol.h
